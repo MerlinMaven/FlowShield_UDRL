@@ -1,0 +1,137 @@
+# =============================================================================
+# Highway-Env Configuration
+# =============================================================================
+# Generalization environment: Highway autonomous driving.
+# Usage: python train.py --config-name=highway shield=diffusion
+
+defaults:
+  - base
+  - _self_
+
+# -----------------------------------------------------------------------------
+# Experiment
+# -----------------------------------------------------------------------------
+experiment:
+  name: "highway-flowshield"
+  seed: 42
+  tags: ["highway", "continuous", "generalization"]
+
+# -----------------------------------------------------------------------------
+# Environment (Highway-Env Continuous)
+# -----------------------------------------------------------------------------
+env:
+  name: "highway-v0"
+  continuous: true
+  normalize_obs: true
+  normalize_reward: true
+  reward_scale: 1.0
+  max_episode_steps: 200
+  # Dimensions
+  state_dim: 25 # 5 vehicles × 5 features (presence, x, y, vx, vy)
+  action_dim: 2 # [acceleration, steering] continuous
+  # Command bounds
+  horizon_max: 200
+  return_min: -50
+  return_max: 50
+  # Highway-specific config
+  highway_config:
+    observation:
+      type: "Kinematics"
+      vehicles_count: 5
+      features: ["presence", "x", "y", "vx", "vy"]
+      absolute: false
+      normalize: true
+    action:
+      type: "ContinuousAction"
+      acceleration_range: [-5.0, 5.0]
+      steering_range: [-0.7, 0.7]
+    lanes_count: 4
+    vehicles_count: 50
+    duration: 40 # seconds
+    collision_reward: -1.0
+    right_lane_reward: 0.1
+    high_speed_reward: 0.4
+    lane_change_reward: 0.0
+    reward_speed_range: [20, 30]
+
+# -----------------------------------------------------------------------------
+# Data Collection
+# -----------------------------------------------------------------------------
+data:
+  n_episodes: 3000
+  expert_ratio: 0.30
+  random_ratio: 0.30
+  medium_ratio: 0.40
+  val_split: 0.1
+  test_split: 0.1
+  normalize_states: true
+  normalize_commands: true
+  save_path: "data/highway_continuous.npz"
+
+# -----------------------------------------------------------------------------
+# UDRL Policy
+# -----------------------------------------------------------------------------
+policy:
+  hidden_dim: 256
+  n_layers: 4
+  activation: "silu"
+  dropout: 0.1
+  command_embed_dim: 64
+  use_fourier_features: true
+  fourier_scale: 20.0
+  learning_rate: 3e-4
+  batch_size: 256
+  n_epochs: 100
+  log_std_min: -5.0
+  log_std_max: 2.0
+
+# -----------------------------------------------------------------------------
+# Shield Configuration
+# -----------------------------------------------------------------------------
+shield:
+  method: "flow_matching"
+  hidden_dim: 256
+  n_layers: 4
+  command_dim: 2
+  learning_rate: 1e-4
+  batch_size: 256
+  n_epochs: 200
+  use_ema: true
+  ema_decay: 0.999
+
+# -----------------------------------------------------------------------------
+# OOD Detection (tuned for Highway)
+# -----------------------------------------------------------------------------
+ood:
+  threshold: -3.5
+  projection_method: "gradient"
+  projection_steps: 40
+  projection_lr: 0.08
+
+# -----------------------------------------------------------------------------
+# Evaluation
+# -----------------------------------------------------------------------------
+evaluation:
+  n_episodes: 150
+  deterministic: true
+  # OOD commands (impossible targets)
+  ood_commands:
+    - { horizon: 50, target_return: 100 } # Impossible (max ~50)
+    - { horizon: 100, target_return: 80 } # Very hard
+    - { horizon: 30, target_return: 60 } # Ambitious
+  # In-distribution baseline
+  id_commands:
+    - { horizon: 150, target_return: 40 }
+    - { horizon: 200, target_return: 35 }
+    - { horizon: 100, target_return: 30 }
+  # Highway-specific metrics
+  metrics:
+    - "episode_return"
+    - "episode_length"
+    - "collision_rate"
+    - "average_speed"
+    - "lane_changes"
+    - "ood_detection_rate"
+    - "projection_rate"
+    - "projection_distance"
+    - "suicide_rate"

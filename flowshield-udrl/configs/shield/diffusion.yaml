@@ -1,0 +1,39 @@
+# =============================================================================
+# Diffusion Shield Configuration
+# =============================================================================
+# DDPM-based conditional generative model for p(g|s).
+# Good quality but slower inference due to iterative denoising.
+#
+# Usage: python train.py shield=diffusion
+
+method: "diffusion"
+
+# Architecture
+hidden_dim: 256
+n_layers: 4
+activation: "silu"
+command_dim: 2
+time_embed_dim: 128
+
+# Diffusion process
+n_timesteps: 1000
+beta_start: 1e-4
+beta_end: 0.02
+beta_schedule: "linear" # linear, cosine, quadratic
+
+# Inference
+n_inference_steps: 20 # DDIM-style fast sampling
+clip_denoised: true
+clip_range: [-10.0, 10.0]
+
+# Training
+learning_rate: 1e-4
+weight_decay: 1e-5
+batch_size: 256
+n_epochs: 200
+grad_clip: 1.0
+use_ema: true
+ema_decay: 0.999
+
+# OOD detection (reconstruction error)
+ood_threshold: -5.0

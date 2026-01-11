@@ -1,0 +1,126 @@
+# =============================================================================
+# D4RL Configuration
+# =============================================================================
+# Configuration for D4RL offline RL benchmarks.
+# Requires: pip install d4rl mujoco
+
+# Inherit from base
+defaults:
+  - base
+
+# -----------------------------------------------------------------------------
+# Experiment
+# -----------------------------------------------------------------------------
+experiment:
+  name: "d4rl-benchmark"
+  seed: 42
+
+# -----------------------------------------------------------------------------
+# Environment (D4RL)
+# -----------------------------------------------------------------------------
+env:
+  name: "halfcheetah-medium-v2" # Options: halfcheetah, hopper, walker2d
+  # Variants: -random-v2, -medium-v2, -expert-v2, -medium-expert-v2, -medium-replay-v2
+  kwargs: {}
+  max_episode_steps: 1000
+  normalize_obs: true
+  normalize_reward: true
+
+# -----------------------------------------------------------------------------
+# Data (Pre-collected in D4RL)
+# -----------------------------------------------------------------------------
+data:
+  use_d4rl: true
+  val_split: 0.1
+  normalize: true
+  # D4RL provides the dataset, so no need for collection
+  # save_path is for processed data
+  save_path: "data/d4rl_processed.pkl"
+
+# -----------------------------------------------------------------------------
+# UDRL Policy (Larger for MuJoCo)
+# -----------------------------------------------------------------------------
+policy:
+  state_dim: 17 # HalfCheetah observation dim
+  action_dim: 6 # HalfCheetah action dim
+  command_dim: 2
+  hidden_dim: 512
+  n_layers: 4
+  continuous: true # Continuous actions!
+  dropout: 0.1
+
+  # For continuous actions
+  action_low: -1.0
+  action_high: 1.0
+  log_std_min: -20.0
+  log_std_max: 2.0
+
+# -----------------------------------------------------------------------------
+# Safety Module
+# -----------------------------------------------------------------------------
+safety:
+  method: "flow"
+  hidden_dim: 512
+  n_layers: 5
+  ood_threshold: 0.2
+
+  projection:
+    method: "gradient"
+    max_steps: 100
+    step_size: 0.01
+
+# -----------------------------------------------------------------------------
+# Flow Matching
+# -----------------------------------------------------------------------------
+flow:
+  hidden_dim: 512
+  n_layers: 5
+  time_embedding_dim: 128
+  sigma_min: 0.0001
+  ot_method: "sinkhorn" # More efficient for larger batches
+  solver: "dopri5"
+  rtol: 1e-6
+  atol: 1e-6
+  n_integration_steps: 200
+  hutchinson_samples: 20
+
+# -----------------------------------------------------------------------------
+# Quantile Baseline
+# -----------------------------------------------------------------------------
+quantile:
+  hidden_dim: 512
+  n_layers: 4
+  tau: 0.9
+  n_quantiles: 10
+
+# -----------------------------------------------------------------------------
+# Training
+# -----------------------------------------------------------------------------
+training:
+  batch_size: 512
+  n_epochs: 200
+  lr: 1e-4
+  weight_decay: 1e-4
+  scheduler: "cosine"
+  warmup_epochs: 10
+  early_stopping: true
+  patience: 20
+  grad_clip: 1.0
+
+# -----------------------------------------------------------------------------
+# Evaluation
+# -----------------------------------------------------------------------------
+evaluation:
+  n_episodes: 100
+  deterministic: false # Sample from policy for continuous
+  test_commands:
+    horizon_range: [100, 1000]
+    return_range: [-1000, 12000] # D4RL returns can be large
+    n_samples: 50
+  metrics:
+    - "episode_return"
+    - "episode_length"
+    - "normalized_score" # D4RL normalized score
+    - "safety_violations"
+    - "projection_rate"
+    - "projection_distance"

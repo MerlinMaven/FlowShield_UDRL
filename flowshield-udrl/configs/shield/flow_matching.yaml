@@ -1,0 +1,47 @@
+# =============================================================================
+# Flow Matching Shield Configuration (Recommended)
+# =============================================================================
+# Optimal Transport Conditional Flow Matching for p(g|s).
+# Fast inference via ODE integration, stable training, exact log-likelihood.
+#
+# Usage: python train.py shield=flow_matching
+
+method: "flow_matching"
+
+# Architecture
+hidden_dim: 256
+n_layers: 4
+activation: "silu"
+command_dim: 2
+time_embed_dim: 128
+
+# Flow Matching
+sigma_min: 1e-4 # Minimum noise for numerical stability
+use_ot_plan: true # Use optimal transport interpolation
+
+# ODE Solver
+solver: "euler" # euler, midpoint, rk4, dopri5
+n_integration_steps: 50 # Number of integration steps
+rtol: 1e-5 # Relative tolerance (for adaptive solvers)
+atol: 1e-5 # Absolute tolerance
+
+# Density estimation
+hutchinson_samples: 10 # Samples for trace estimation
+
+# Training
+learning_rate: 1e-4
+weight_decay: 1e-5
+batch_size: 256
+n_epochs: 200
+grad_clip: 1.0
+use_ema: true
+ema_decay: 0.999
+
+# OOD detection (log-likelihood)
+ood_threshold: -5.0
+
+# Projection
+projection_method: "gradient"
+projection_steps: 50
+projection_lr: 0.1
+projection_momentum: 0.9

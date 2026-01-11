@@ -1,0 +1,38 @@
+{
+  "No Shield": {
+    "mean_return": -130.03722113633125,
+    "std_return": 77.60490085848194,
+    "mean_length": 99.875,
+    "success_rate": 0.0,
+    "crash_rate": 0.75,
+    "ood_detections": 0,
+    "projections": 0
+  },
+  "Quantile": {
+    "mean_return": -260.04052481768815,
+    "std_return": 68.2788002630337,
+    "mean_length": 98.5,
+    "success_rate": 0.0,
+    "crash_rate": 1.0,
+    "ood_detections": 442,
+    "projections": 442
+  },
+  "Flow Matching": {
+    "mean_return": -233.41878243877392,
+    "std_return": 94.84430913415231,
+    "mean_length": 102.75,
+    "success_rate": 0.0,
+    "crash_rate": 1.0,
+    "ood_detections": 751,
+    "projections": 751
+  },
+  "Diffusion": {
+    "mean_return": -203.2834330374538,
+    "std_return": 109.58965334756287,
+    "mean_length": 113.375,
+    "success_rate": 0.0,
+    "crash_rate": 0.75,
+    "ood_detections": 907,
+    "projections": 907
+  }
+}

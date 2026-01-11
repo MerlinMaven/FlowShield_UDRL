@@ -1,0 +1,260 @@
+# =============================================================================
+# FlowShield-UDRL: Base Configuration (Scientific Experiments)
+# =============================================================================
+# Supports continuous control environments and 3 safety shield methods.
+#
+# Usage Examples:
+#   python train_hydra.py env=lunarlander shield=flow_matching
+#   python train_hydra.py env=highway shield=diffusion
+#   python evaluate_ood.py env=lunarlander shield=quantile
+
+# -----------------------------------------------------------------------------
+# Defaults (Hydra composition)
+# -----------------------------------------------------------------------------
+defaults:
+  - _self_
+  - env: lunarlander
+  - shield: flow_matching
+
+# -----------------------------------------------------------------------------
+# Global Settings (available as ${seed}, ${device}, etc.)
+# -----------------------------------------------------------------------------
+seed: 42
+device: "cuda"
+checkpoint_dir: "checkpoints"
+data:
+  path: "data"
+  n_expert: 100
+  n_random: 100
+  n_medium: 100
+
+# -----------------------------------------------------------------------------
+# Training Settings
+# -----------------------------------------------------------------------------
+training:
+  log_interval: 10
+  val_split: 0.1
+  num_workers: 4
+
+# -----------------------------------------------------------------------------
+# Evaluation Settings
+# -----------------------------------------------------------------------------
+eval:
+  n_episodes: 10
+  max_episode_steps: 1000
+  output_dir: "results"
+
+# -----------------------------------------------------------------------------
+# Experiment Metadata
+# -----------------------------------------------------------------------------
+experiment:
+  name: "flowshield-udrl"
+  seed: 42
+  device: "cuda"
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  save_frequency: 10
+  
+# -----------------------------------------------------------------------------
+# Weights & Biases
+# -----------------------------------------------------------------------------
+wandb:
+  enabled: true
+  project: "flowshield-udrl"
+  entity: null
+  mode: "online"
+  tags: ["safety", "udrl", "ood", "continuous"]
+  notes: ""
+
+# -----------------------------------------------------------------------------
+# Environment (Continuous Control)
+# -----------------------------------------------------------------------------
+env:
+  name: "LunarLander-v2"
+  continuous: true
+  normalize_obs: true
+  normalize_reward: true
+  reward_scale: 1.0
+  max_episode_steps: 1000
+  # Dimensions (overridden per env)
+  state_dim: 8
+  action_dim: 2
+  # Command bounds (for normalization)
+  horizon_max: 1000
+  return_min: -500
+  return_max: 300
+
+# -----------------------------------------------------------------------------
+# Data Collection (Mixed Quality for Rich Distribution)
+# -----------------------------------------------------------------------------
+data:
+  n_episodes: 5000
+  # Policy mixture (critical for learning OOD boundaries)
+  expert_ratio: 0.3
+  random_ratio: 0.4
+  medium_ratio: 0.3
+  # Splitting
+  val_split: 0.1
+  test_split: 0.1
+  # Normalization
+  normalize_states: true
+  normalize_commands: true
+  # Persistence
+  save_path: "data/${env.name}_trajectories.npz"
+  load_path: null
+
+# -----------------------------------------------------------------------------
+# UDRL Policy (Goal-Conditioned Behavioral Cloning)
+# -----------------------------------------------------------------------------
+policy:
+  # Architecture
+  hidden_dim: 256
+  n_layers: 4
+  activation: "silu"
+  dropout: 0.1
+  # Command embedding (Fourier features for better extrapolation)
+  command_embed_dim: 64
+  use_fourier_features: true
+  fourier_scale: 30.0
+  # Training
+  learning_rate: 3e-4
+  weight_decay: 1e-5
+  batch_size: 256
+  n_epochs: 100
+  grad_clip: 1.0
+  # Continuous action head
+  log_std_min: -10.0
+  log_std_max: 2.0
+  # Scheduler
+  use_scheduler: true
+  warmup_steps: 1000
+
+# -----------------------------------------------------------------------------
+# Shield Configuration (3 Methods)
+# -----------------------------------------------------------------------------
+shield:
+  # Method selection: "quantile", "diffusion", "flow_matching"
+  method: "flow_matching"
+  
+  # Common architecture
+  hidden_dim: 256
+  n_layers: 4
+  activation: "silu"
+  dropout: 0.0
+  command_dim: 2
+  
+  # Training
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+  batch_size: 256
+  n_epochs: 200
+  grad_clip: 1.0
+  use_ema: true
+  ema_decay: 0.999
+
+# -----------------------------------------------------------------------------
+# Quantile Shield (Baseline - Pinball Loss)
+# -----------------------------------------------------------------------------
+quantile:
+  tau: 0.9  # 90th percentile
+  n_quantiles: 1
+  pinball_loss: true
+
+# -----------------------------------------------------------------------------
+# Diffusion Shield (DDPM Conditional)
+# -----------------------------------------------------------------------------
+diffusion:
+  # Noise schedule
+  n_timesteps: 1000
+  beta_start: 1e-4
+  beta_end: 0.02
+  beta_schedule: "linear"  # linear, cosine, quadratic
+  # Time embedding
+  time_embed_dim: 128
+  # Inference (denoising steps)
+  n_inference_steps: 20
+  # Clipping
+  clip_denoised: true
+  clip_range: [-10.0, 10.0]
+
+# -----------------------------------------------------------------------------
+# Flow Matching Shield (Optimal Transport CFM)
+# -----------------------------------------------------------------------------
+flow_matching:
+  # ODE Solver
+  solver: "euler"  # euler, midpoint, rk4, dopri5
+  n_integration_steps: 50
+  rtol: 1e-5
+  atol: 1e-5
+  # Optimal Transport
+  sigma_min: 1e-4
+  use_ot_plan: true  # Mini-batch OT for training
+  # Time embedding
+  time_embed_dim: 128
+  # Density estimation
+  hutchinson_samples: 10
+
+# -----------------------------------------------------------------------------
+# OOD Detection & Command Projection
+# -----------------------------------------------------------------------------
+ood:
+  # Detection threshold
+  threshold: -5.0
+  threshold_type: "log_likelihood"  # log_likelihood, percentile
+  percentile: 5  # Used if threshold_type=percentile
+  # Projection
+  projection_method: "gradient"  # gradient, sampling, boundary
+  projection_steps: 50
+  projection_lr: 0.1
+  projection_momentum: 0.9
+
+# -----------------------------------------------------------------------------
+# Training Pipeline
+# -----------------------------------------------------------------------------
+training:
+  # Two-phase training
+  policy_first: true
+  freeze_policy_for_shield: true
+  # Optimizer
+  optimizer: "adamw"
+  betas: [0.9, 0.999]
+  # Scheduler
+  scheduler: "cosine"
+  warmup_epochs: 5
+  min_lr: 1e-6
+  # Early stopping
+  early_stopping: true
+  patience: 20
+  min_delta: 1e-4
+  # Checkpointing
+  save_every: 10
+  keep_best: 3
+
+# -----------------------------------------------------------------------------
+# Evaluation (OOD Testing)
+# -----------------------------------------------------------------------------
+evaluation:
+  n_episodes: 100
+  deterministic: true
+  # OOD command sweep
+  ood_commands:
+    - {horizon: 50, target_return: 500}   # Impossible
+    - {horizon: 20, target_return: 400}   # Very hard
+    - {horizon: 100, target_return: 350}  # Ambitious
+    - {horizon: 200, target_return: 280}  # Feasible
+  # In-distribution baseline
+  id_commands:
+    - {horizon: 200, target_return: 200}
+    - {horizon: 300, target_return: 150}
+  # Metrics
+  metrics:
+    - "episode_return"
+    - "episode_length"
+    - "ood_detection_rate"
+    - "projection_rate"
+    - "projection_distance"
+    - "suicide_rate"
+  # Visualization
+  save_trajectories: true
+  plot_command_space: true
+  plot_projections: true

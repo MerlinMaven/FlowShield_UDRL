@@ -1,0 +1,31 @@
+# =============================================================================
+# Quantile Shield Configuration
+# =============================================================================
+# Baseline method using pinball loss for conservative return estimation.
+# Fast inference but limited OOD detection capability.
+#
+# Usage: python train.py shield=quantile
+
+method: "quantile"
+
+# Architecture
+hidden_dim: 256
+n_layers: 4
+activation: "silu"
+command_dim: 2
+
+# Quantile regression
+tau: 0.9 # 90th percentile (conservative)
+n_quantiles: 1 # Single quantile prediction
+pinball_loss: true # Use asymmetric loss
+
+# Training
+learning_rate: 1e-3
+weight_decay: 1e-5
+batch_size: 256
+n_epochs: 100
+grad_clip: 1.0
+use_ema: false
+
+# OOD threshold (gap between command and prediction)
+ood_threshold: -1.0

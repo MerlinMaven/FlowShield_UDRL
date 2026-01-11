@@ -1,0 +1,124 @@
+# =============================================================================
+# LunarLander-v2 Continuous Configuration
+# =============================================================================
+# Primary experimental environment: LunarLander with continuous actions.
+# Usage: python train.py --config-name=lunarlander shield=flow_matching
+
+defaults:
+  - base
+  - _self_
+
+# -----------------------------------------------------------------------------
+# Experiment
+# -----------------------------------------------------------------------------
+experiment:
+  name: "lunarlander-flowshield"
+  seed: 42
+  tags: ["lunarlander", "continuous", "primary"]
+
+# -----------------------------------------------------------------------------
+# Environment (LunarLander-v2 Continuous)
+# -----------------------------------------------------------------------------
+env:
+  name: "LunarLanderContinuous-v2"
+  continuous: true
+  normalize_obs: true
+  normalize_reward: false # Keep original reward scale
+  reward_scale: 1.0
+  max_episode_steps: 1000
+  # Dimensions
+  state_dim: 8 # [x, y, vx, vy, angle, angular_vel, leg1, leg2]
+  action_dim: 2 # [main_engine, side_engine] in [-1, 1]
+  # Command bounds (empirical from expert data)
+  horizon_max: 1000
+  return_min: -500 # Crash scenarios
+  return_max: 280 # Perfect landing ~200-280
+
+# -----------------------------------------------------------------------------
+# Data Collection (Mixed Quality Dataset)
+# -----------------------------------------------------------------------------
+data:
+  n_episodes: 5000
+  # Policy mixture for diverse return distribution
+  expert_ratio: 0.25 # ~25% near-optimal (SAC/PPO trained)
+  random_ratio: 0.35 # ~35% random exploration
+  medium_ratio: 0.40 # ~40% partially trained policies
+  # Splits
+  val_split: 0.1
+  test_split: 0.1
+  # Normalization
+  normalize_states: true
+  normalize_commands: true
+  # Persistence
+  save_path: "data/lunarlander_continuous.npz"
+
+# -----------------------------------------------------------------------------
+# UDRL Policy
+# -----------------------------------------------------------------------------
+policy:
+  hidden_dim: 256
+  n_layers: 4
+  activation: "silu"
+  dropout: 0.1
+  # Command embedding
+  command_embed_dim: 64
+  use_fourier_features: true
+  fourier_scale: 30.0
+  # Training
+  learning_rate: 3e-4
+  batch_size: 256
+  n_epochs: 150
+  # Continuous action (Gaussian policy)
+  log_std_min: -5.0
+  log_std_max: 2.0
+
+# -----------------------------------------------------------------------------
+# Shield Configuration
+# -----------------------------------------------------------------------------
+shield:
+  method: "flow_matching" # Default to our method
+  hidden_dim: 256
+  n_layers: 4
+  command_dim: 2
+  learning_rate: 1e-4
+  batch_size: 256
+  n_epochs: 300
+  use_ema: true
+  ema_decay: 0.999
+
+# -----------------------------------------------------------------------------
+# OOD Detection (tuned for LunarLander)
+# -----------------------------------------------------------------------------
+ood:
+  threshold: -4.0 # Log-likelihood threshold
+  projection_method: "gradient"
+  projection_steps: 50
+  projection_lr: 0.05
+
+# -----------------------------------------------------------------------------
+# Evaluation (OOD Stress Test)
+# -----------------------------------------------------------------------------
+evaluation:
+  n_episodes: 200
+  deterministic: true
+  # OOD commands (impossible targets)
+  ood_commands:
+    - { horizon: 50, target_return: 500 } # Impossible (max ~280)
+    - { horizon: 100, target_return: 400 } # Impossible
+    - { horizon: 50, target_return: 350 } # Very hard
+    - { horizon: 200, target_return: 300 } # Ambitious
+  # In-distribution baseline
+  id_commands:
+    - { horizon: 500, target_return: 200 } # Good landing
+    - { horizon: 300, target_return: 150 } # Decent
+    - { horizon: 400, target_return: 100 } # Conservative
+  # LunarLander-specific metrics
+  metrics:
+    - "episode_return"
+    - "episode_length"
+    - "landing_success" # Legs touching, low velocity
+    - "crash_rate" # High velocity impact
+    - "ood_detection_rate"
+    - "projection_rate"
+    - "projection_distance"
+    - "suicide_rate" # Agent crashes pursuing impossible goal
