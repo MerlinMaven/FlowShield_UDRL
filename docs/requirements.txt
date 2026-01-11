@@ -1,7 +1,11 @@
-# Documentation requirements
-sphinx>=5.0
+# Documentation requirements for ReadTheDocs
+sphinx>=5.0,<8.0
 sphinx-rtd-theme>=1.0
 sphinx-autodoc-typehints>=1.12
 sphinx-copybutton>=0.5
 myst-parser>=0.18
 sphinxcontrib-bibtex>=2.5
+
+# Minimum dependencies needed for imports (mock these in conf.py instead)
+# numpy
+# torch

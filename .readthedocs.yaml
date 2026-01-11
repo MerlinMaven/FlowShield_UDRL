@@ -16,4 +16,4 @@ sphinx:
 # Optionally, but recommended, declare the Python requirements
 python:
   install:
-    - requirements: requirements.txt
+    - requirements: docs/requirements.txt

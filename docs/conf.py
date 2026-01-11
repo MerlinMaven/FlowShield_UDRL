@@ -3,6 +3,19 @@
 
 import os
 import sys
+from unittest.mock import MagicMock
+
+# Mock heavy dependencies for ReadTheDocs
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = ['torch', 'torch.nn', 'torch.optim', 'numpy', 'scipy', 
+                'gymnasium', 'stable_baselines3', 'torchdyn', 'tensorboard',
+                'tqdm', 'matplotlib', 'matplotlib.pyplot', 'PIL']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
