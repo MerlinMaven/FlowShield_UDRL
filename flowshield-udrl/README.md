@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ FlowShield-UDRL
+# FlowShield-UDRL
 
 ### Safe Command-Conditioned Reinforcement Learning via Flow Matching
 
@@ -11,45 +11,39 @@
 
 ---
 
-### 🎯 Preventing Catastrophic Failures in Command-Conditioned RL
+**Preventing Catastrophic Failures in Command-Conditioned RL**
 
-<img src="results/final/gifs/shield_demo/OOD_crash_demo.gif" alt="Shield Demo" width="900"/>
+<img src="results/final/gifs/shield_demo/OOD_crash_demo.gif" alt="Shield Demo" width="800"/>
 
-<sub>**Without Shield**: Agent crashes (-106) | **With Shield**: Safe landing (+289) ✅</sub>
-
-[📊 Results](#-key-results) •
-[🎬 Demos](#-visual-demonstrations) •
-[🚀 Install](#-installation) •
-[⚙️ Quick Start](#-quick-start) •
-[🧠 Methodology](#-methodology)
+**Without Shield**: Agent crashes attempting impossible commands (-106 return)  
+**With Shield**: Agent safely lands by projecting to achievable commands (+289 return)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [🔬 Overview](#-overview)
-- [📊 Key Results](#-key-results)
-- [🎬 Visual Demonstrations](#-visual-demonstrations)
-- [🚀 Installation](#-installation)
-- [⚙️ Quick Start](#-quick-start)
-- [📁 Project Structure](#-project-structure)
-- [🧠 Methodology](#-methodology)
-- [🧪 Experiments](#-experiments)
-- [📈 Results Analysis](#-results-analysis)
+- [Overview](#overview)
+- [Key Results](#key-results)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Methodology](#methodology)
+- [Experiments](#experiments)
+- [Results Analysis](#results-analysis)
 
 ---
 
-## 🔬 Overview
+## Overview
 
 ### The Problem: "Obedient Suicide" in UDRL
 
 **Upside-Down Reinforcement Learning (UDRL)** trains policies conditioned on desired outcomes (horizon, return). However, when users request **impossible or out-of-distribution (OOD) commands**, the agent blindly attempts execution, leading to:
 
-- ⚠️ **Erratic, dangerous behavior**
-- 💥 **System crashes and safety violations**  
-- ❌ **Failure to achieve reasonable performance**
+- Erratic, dangerous behavior
+- System crashes and safety violations
+- Failure to achieve reasonable performance
 
 **Real-world Impact**: In safety-critical applications (robotics, autonomous systems), blindly following impossible commands can cause physical damage or mission failure.
 
@@ -57,9 +51,9 @@
 
 We leverage **Flow Matching** (Lipman et al., 2023) — a state-of-the-art generative modeling technique — to create a safety shield that:
 
-1. 📊 **Models** the distribution `p(g|s)` of achievable commands given state
-2. 🔍 **Detects** OOD commands via log-likelihood estimation
-3. 🛡️ **Projects** unsafe commands onto the manifold of achievable commands
+1. Models the distribution `p(g|s)` of achievable commands given state
+2. Detects OOD commands via log-likelihood estimation
+3. Projects unsafe commands onto the manifold of achievable commands
 
 ### Key Innovation
 
@@ -71,7 +65,7 @@ This work addresses a **critical research gap** in command-conditioned reinforce
 
 ---
 
-## 📊 Key Results
+## Key Results
 
 ### LunarLander-v3 (Continuous Control) — Benchmark Results
 
@@ -80,50 +74,14 @@ This work addresses a **critical research gap** in command-conditioned reinforce
 | No Shield (Baseline) | 211.4       | 84.7     | 0%            | -           |
 | Diffusion Shield     | 209.9       | 84.1     | 14%           | -0.7%       |
 | Quantile Shield      | 218.3       | 62.4     | 45%           | +3.3%       |
-| **Flow Shield** ⭐    | **235.0**   | **26.0** | **77%**       | **+11.2%**  |
+| **Flow Shield**      | **235.0**   | **26.0** | **77%**       | **+11.2%**  |
 
-#### 🏆 Highlights
+### Highlights
 
-- ✅ **+11.2%** improvement in mean return vs. unprotected baseline
-- ✅ **-69%** reduction in variance (26.0 vs 84.7) — dramatically more reliable
-- ✅ **77%** OOD command detection rate — catches most impossible requests
-- ✅ **Seamless integration** — works with any pre-trained UDRL policy
-
-#### Visual Comparison
-
-| Scenario                       | No Shield           | With Flow Shield    |
-| ------------------------------ | ------------------- | ------------------- |
-| **OOD Extreme** (H=5, R=500)   | Crash (return -106) | Safe landing (+289) |
-| **Moderate OOD** (H=50, R=350) | Crash (return -165) | Safe landing (+267) |
-| **In-Distribution** (H=200, R=220) | Landing (+230)  | Landing (+231)      |
-
----
-
-## 🎬 Visual Demonstrations
-
-### Extreme OOD Command: H=5, R=500
-
-<div align="center">
-<img src="results/final/gifs/shield_demo/OOD_extreme_demo.gif" alt="OOD Extreme Demo" width="800"/>
-<br/>
-<sub><b>Left</b>: Crash -1199 | <b>Right</b>: Safe landing +267 ✅</sub>
-</div>
-
-### Moderate OOD Command: H=50, R=350
-
-<div align="center">
-<img src="results/final/gifs/shield_demo/OOD_moderate_demo.gif" alt="OOD Moderate Demo" width="800"/>
-<br/>
-<sub><b>Left</b>: Crash -165 | <b>Right</b>: Safe landing +267 ✅</sub>
-</div>
-
-### In-Distribution Command: H=200, R=220
-
-<div align="center">
-<img src="results/final/gifs/shield_demo/ID_demo.gif" alt="ID Demo" width="800"/>
-<br/>
-<sub><b>Left</b>: Landing +231 | <b>Right</b>: Landing +231 ✅ (Shield maintains performance)</sub>
-</div>
+- +11.2% improvement in mean return vs. unprotected baseline
+- -69% reduction in variance (26.0 vs 84.7) — dramatically more reliable
+- 77% OOD command detection rate — catches most impossible requests
+- Seamless integration — works with any pre-trained UDRL policy
 
 ---
 
@@ -266,11 +224,11 @@ Learn optimal transport from noise to command distribution:
 dg_t/dt = v_θ(g_t, s, t),  t ∈ [0, 1]
 ```
 
-**Capabilities:**
+Capabilities:
 
-- **Density estimation**: `log p(g|s)` via ODE integration
-- **Sampling**: Draw from `p(g|s)` for command generation
-- **Projection**: Map OOD commands to manifold boundary
+- Density estimation: `log p(g|s)` via ODE integration
+- Sampling: Draw from `p(g|s)` for command generation
+- Projection: Map OOD commands to manifold boundary
 
 ### 3. OOD Detection and Projection
 
@@ -349,9 +307,9 @@ All models converge efficiently with early stopping:
 
 ### Limitations and Future Work
 
-1. **Data Homogeneity**: Current expert dataset has relatively low variance, limiting command-following precision
-2. **UDRL Fundamental Challenge**: When training data lacks diversity, the policy learns average behavior
-3. **Recommendation**: For precise command-following, collect expert data with diverse return profiles
+1. Data Homogeneity: Current expert dataset has relatively low variance, limiting command-following precision
+2. UDRL Fundamental Challenge: When training data lacks diversity, the policy learns average behavior
+3. Recommendation: For precise command-following, collect expert data with diverse return profiles
 
 ---
 
@@ -369,7 +327,7 @@ This project builds upon excellent open-source work:
 - [torchdyn](https://github.com/DiffEqML/torchdyn) — Neural ODE solvers for flow matching
 - [Gymnasium](https://gymnasium.farama.org/) — LunarLander-v3 environment
 
-**Key References:**
+Key References:
 - Schmidhuber (2019): *Reinforcement Learning Upside Down* — Original UDRL formulation
 - Lipman et al. (2023): *Flow Matching for Generative Modeling* — Flow matching framework
 
