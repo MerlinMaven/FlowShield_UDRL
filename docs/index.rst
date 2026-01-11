@@ -207,19 +207,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-----
-
-Citation
---------
-
-If you use FlowShield-UDRL in your research, please cite:
-
-.. code-block:: bibtex
-
-    @article{flowshield2026,
-        title={FlowShield: Safe Command-Conditioned RL via Flow Matching},
-        author={FlowShield Team},
-        journal={arXiv preprint},
-        year={2026}
-    }

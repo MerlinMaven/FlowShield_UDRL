@@ -63,13 +63,14 @@ html_theme_options = {
     'vcs_pageview_mode': 'view',
 }
 
-# GitHub integration - "View on GitHub" points to repository
+# GitHub integration - "View on GitHub" points to repository root
 html_context = {
     'display_github': True,
     'github_user': 'MerlinMaven',
     'github_repo': 'FlowShield_UDRL',
     'github_version': 'main',
-    'conf_py_path': '',
+    'conf_py_path': '/',
+    'vcs_pageview_mode': 'view',
     'github_url': 'https://github.com/MerlinMaven/FlowShield_UDRL',
 }
 
