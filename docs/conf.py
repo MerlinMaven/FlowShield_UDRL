@@ -60,17 +60,17 @@ html_theme_options = {
     'navigation_depth': 4,
     'includehidden': True,
     'titles_only': False,
-    'vcs_pageview_mode': '',
+    'vcs_pageview_mode': 'view',
 }
 
-# Replace "Edit on GitHub" with "View on GitHub" pointing to repo
+# GitHub integration - "View on GitHub" points to repository
 html_context = {
     'display_github': True,
     'github_user': 'MerlinMaven',
     'github_repo': 'FlowShield_UDRL',
     'github_version': 'main',
-    'conf_py_path': '/docs/',
-    'theme_vcs_pageview_mode': 'blob',
+    'conf_py_path': '',
+    'github_url': 'https://github.com/MerlinMaven/FlowShield_UDRL',
 }
 
 # -- Extension configuration -------------------------------------------------
