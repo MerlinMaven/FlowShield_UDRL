@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 project = 'FlowShield-UDRL'
-copyright = '2026, FlowShield Team'
-author = 'FlowShield Team'
+copyright = '2026, Serraji Wiam'
+author = 'Serraji Wiam'
 
 # -- General configuration ---------------------------------------------------
 extensions = [
