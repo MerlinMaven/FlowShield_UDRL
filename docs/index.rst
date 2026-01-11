@@ -15,6 +15,23 @@ FlowShield-UDRL Documentation
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
 
+.. image:: https://img.shields.io/github/stars/MerlinMaven/FlowShield_UDRL?style=social
+   :target: https://github.com/MerlinMaven/FlowShield_UDRL
+
+----
+
+Preventing Catastrophic Failures in Command-Conditioned RL
+-----------------------------------------------------------
+
+.. image:: https://raw.githubusercontent.com/MerlinMaven/FlowShield_UDRL/main/results/final/gifs/shield_demo/OOD_crash_demo.gif
+   :alt: Shield Demo - Crash without shield, safe landing with shield
+   :align: center
+   :width: 80%
+
+**Without Shield**: Agent crashes attempting impossible commands (return: -106)
+
+**With Shield**: Agent safely lands by projecting to achievable commands (return: +289)
+
 ----
 
 Overview
