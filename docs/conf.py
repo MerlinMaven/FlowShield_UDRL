@@ -69,9 +69,7 @@ html_context = {
     'github_user': 'MerlinMaven',
     'github_repo': 'FlowShield_UDRL',
     'github_version': 'main',
-    'conf_py_path': '/',
-    'vcs_pageview_mode': 'view',
-    'github_url': 'https://github.com/MerlinMaven/FlowShield_UDRL',
+    'conf_py_path': '/docs/',
 }
 
 # -- Extension configuration -------------------------------------------------

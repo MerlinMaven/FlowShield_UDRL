@@ -198,12 +198,3 @@ See :doc:`quickstart` for detailed instructions.
    best_practices
    faq
    bibliography
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
