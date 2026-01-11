@@ -60,16 +60,16 @@ html_theme_options = {
     'navigation_depth': 4,
     'includehidden': True,
     'titles_only': False,
-    'vcs_pageview_mode': 'view',
 }
 
-# GitHub integration - "View on GitHub" points to repository root
+# GitHub integration - Direct link to repository
 html_context = {
     'display_github': True,
     'github_user': 'MerlinMaven',
     'github_repo': 'FlowShield_UDRL',
     'github_version': 'main',
     'conf_py_path': '/docs/',
+    'source_url_prefix': 'https://github.com/MerlinMaven/FlowShield_UDRL/tree/main/',
 }
 
 # -- Extension configuration -------------------------------------------------
