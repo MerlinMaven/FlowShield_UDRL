@@ -13,7 +13,7 @@
 
 **Preventing Catastrophic Failures in Command-Conditioned RL**
 
-<img src="flowshield-udrl/results/final/gifs/shield_demo/OOD_crash_demo.gif" alt="Shield Demo" width="800"/>
+<img src="results/final/gifs/shield_demo/OOD_crash_demo.gif" alt="Shield Demo" width="800"/>
 
 **Without Shield**: Agent crashes attempting impossible commands (-106 return)  
 **With Shield**: Agent safely lands by projecting to achievable commands (+289 return)
