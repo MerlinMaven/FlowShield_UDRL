@@ -62,16 +62,8 @@ html_theme_options = {
     'titles_only': False,
 }
 
-# GitHub integration - Direct link to repository root
-html_context = {
-    'display_github': True,
-    'github_user': 'MerlinMaven',
-    'github_repo': 'FlowShield_UDRL',
-    'github_version': 'main',
-    'conf_py_path': '',
-    'source_url_prefix': 'https://github.com/MerlinMaven/FlowShield_UDRL',
-}
-
+# Disable GitHub integration to avoid broken links
+html_context = {}
 # -- Extension configuration -------------------------------------------------
 # Napoleon settings (for Google/NumPy docstrings)
 napoleon_google_docstring = True
