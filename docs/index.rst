@@ -15,9 +15,6 @@ FlowShield-UDRL Documentation
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
 
-.. image:: https://img.shields.io/github/stars/MerlinMaven/FlowShield_UDRL?style=social
-   :target: https://github.com/MerlinMaven/FlowShield_UDRL
-
 ----
 
 Preventing Catastrophic Failures in Command-Conditioned RL

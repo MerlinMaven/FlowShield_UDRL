@@ -63,13 +63,14 @@ html_theme_options = {
     'vcs_pageview_mode': '',
 }
 
-# Replace "View page source" with GitHub link
+# Replace "Edit on GitHub" with "View on GitHub" pointing to repo
 html_context = {
     'display_github': True,
     'github_user': 'MerlinMaven',
     'github_repo': 'FlowShield_UDRL',
     'github_version': 'main',
     'conf_py_path': '/docs/',
+    'theme_vcs_pageview_mode': 'blob',
 }
 
 # -- Extension configuration -------------------------------------------------
